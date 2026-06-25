@@ -56,3 +56,9 @@ chmod +x demo-script.sh
 ```
 
 *Note: Press **ENTER** after reading each step to run the command and watch the lifecycle happen in real-time!*
+
+---
+
+## 📄 License
+
+This repository is licensed under the [MIT License](LICENSE). Feel free to use, modify, and distribute it.
