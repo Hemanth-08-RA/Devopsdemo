@@ -12,21 +12,23 @@ Welcome to the Docker learning module! This directory contains simple, clear, an
 
 While Virtual Machines package a full operating system (including the kernel), Docker containers share the host system's kernel, making them much faster, smaller, and resource-efficient:
 
-```
-+---------------------------------------+   +---------------------------------------+
-|          Virtual Machines             |   |           Docker Containers           |
-+---------------------------------------+   +---------------------------------------+
-|  +-----------+  +-----------+         |   |  +-----------+  +-----------+         |
-|  | App A     |  | App B     |         |   |  | App A     |  | App B     |         |
-|  | Libs      |  | Libs      |         |   |  | Libs      |  | Libs      |         |
-|  | Guest OS  |  | Guest OS  |         |   |  +-----------+  +-----------+         |
-|  +-----------+  +-----------+         |   |  |     Docker Engine (Shared)     |         |
-|  |        Hypervisor (VMware/ESXi)    |   |  +---------------------------------+         |
-|  +---------------------------------+  |   |  |        Host Operating System       |         |
-|  |      Host Operating System      |  |   |  +---------------------------------+         |
-|  +---------------------------------+  |   |  |             Hardware                |         |
-|  |             Hardware                |  |   +---------------------------------------+
-+---------------------------------------+
+```mermaid
+graph TD
+    subgraph VM["Virtual Machines Stack"]
+        direction TB
+        A["App A & App B"] --- B["Bins / Libs"]
+        B --- C["Guest OS"]
+        C --- D["Hypervisor (e.g., VMware)"]
+        D --- E["Host OS"]
+        E --- F["Infrastructure / Hardware"]
+    end
+    subgraph Docker["Docker Containers Stack"]
+        direction TB
+        A2["App A & App B"] --- B2["Bins / Libs"]
+        B2 --- D2["Docker Engine (Shared)"]
+        D2 --- E2["Host OS"]
+        E2 --- F2["Infrastructure / Hardware"]
+    end
 ```
 
 ---
