@@ -23,14 +23,9 @@ Git tracks your files across three main areas. Understanding these stages is the
 
 ```mermaid
 graph LR
-    A["Working Directory<br>(Unstaged Changes)"] -->|git add| B["Staging Area<br>(Index / Staged)"]
-    B -->|git commit| C["Local Repository<br>(Committed History)"]
-    C -->|git push| D["Remote Repository<br>(GitHub)"]
-    
-    style A fill:#f9f,stroke:#333,stroke-width:2px
-    style B fill:#bbf,stroke:#333,stroke-width:2px
-    style C fill:#bfb,stroke:#333,stroke-width:2px
-    style D fill:#fbb,stroke:#333,stroke-width:2px
+    A["💻 Working Directory<br>(Unstaged Changes)"] -->|git add| B["📦 Staging Area<br>(Index / Staged)"]
+    B -->|git commit| C["💾 Local Repository<br>(Committed History)"]
+    C -->|git push| D["☁️ Remote Repository<br>(GitHub)"]
 ```
 
 1. **Working Directory (Unstaged)**: This is where you modify your files. Git knows the files have changed but hasn't prepared them to be saved yet.
