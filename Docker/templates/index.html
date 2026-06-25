@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dockerized Flask Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: rgba(22, 27, 34, 0.7);
+            --card-border: rgba(48, 54, 61, 0.8);
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-purple: #bc8cff;
+            --accent-green: #3fb950;
+            --glow-color: rgba(88, 166, 255, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(88, 166, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(188, 140, 255, 0.08) 0%, transparent 40%);
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2.5rem 1.5rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            color: var(--accent-blue);
+            filter: drop-shadow(0 0 10px rgba(88, 166, 255, 0.5));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .logo-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-title p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            background: rgba(63, 185, 80, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 0 15px rgba(63, 185, 80, 0.1);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(63, 185, 80, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
+        }
+
+        main {
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 1.5rem 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            opacity: 0.7;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(88, 166, 255, 0.4);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(88, 166, 255, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 1rem;
+        }
+
+        .card-header i {
+            font-size: 1.4rem;
+            color: var(--accent-blue);
+        }
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .info-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+            word-break: break-all;
+        }
+
+        .generator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            background: rgba(22, 27, 34, 0.9);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 0.9rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #1f6feb 100%);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(31, 111, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(31, 111, 235, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .command-output {
+            margin-top: 1.5rem;
+            background: #05070a;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.2rem;
+            position: relative;
+        }
+
+        .command-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent-purple);
+            word-break: break-all;
+            padding-right: 2.5rem;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            color: var(--accent-blue);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .env-vars-wrapper {
+            margin-top: 1.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            background: rgba(0,0,0,0.15);
+        }
+
+        .env-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .env-table th, .env-table td {
+            padding: 0.6rem 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .env-table th {
+            background: rgba(255,255,255,0.02);
+            color: var(--text-muted);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(5px);
+        }
+
+        .env-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .env-key {
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .env-value {
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        footer {
+            margin-top: auto;
+            width: 100%;
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--card-border);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Loading indicator styling */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-blue);
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-area">
+            <i class="fa-solid fa-cubes logo-icon"></i>
+            <div class="logo-title">
+                <h1>Dockerized App</h1>
+                <p>Flask Environment Dashboard</p>
+            </div>
+        </div>
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            <span id="health-status">Checking...</span>
+        </div>
+    </header>
+
+    <main>
+        <!-- Card 1: Container Environment Details -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-server"></i>
+                <h2>Environment Diagnostics</h2>
+            </div>
+            
+            <div class="info-grid" id="info-grid">
+                <!-- Loaded dynamically -->
+                <div class="info-label">OS Platform</div>
+                <div class="info-value"><span class="loader"></span></div>
+                <div class="info-label">Architecture</div>
+                <div class="info-value"><span class="loader"></span></div>
+                <div class="info-label">Python Version</div>
+                <div class="info-value"><span class="loader"></span></div>
+                <div class="info-label">Container Time</div>
+                <div class="info-value"><span class="loader"></span></div>
+            </div>
+
+            <h3 style="margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-gears" style="color: var(--accent-purple);"></i>
+                Environment Variables
+            </h3>
+            
+            <div class="env-vars-wrapper">
+                <table class="env-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="env-table-body">
+                        <tr>
+                            <td colspan="2" style="text-align: center; color: var(--text-muted);">Loading environment...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card 2: Docker Command Helper -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-brands fa-docker" style="color: #0db7ed;"></i>
+                <h2>Docker Helper</h2>
+            </div>
+            
+            <div class="generator-form">
+                <div class="form-group">
+                    <label for="image-name">Image Name</label>
+                    <input type="text" id="image-name" value="my-flask-app" placeholder="e.g., my-flask-app">
+                </div>
+                
+                <div class="form-group">
+                    <label for="host-port">Host Port</label>
+                    <input type="number" id="host-port" value="8080" min="1" max="65535">
+                </div>
+                
+                <div class="form-group">
+                    <label for="docker-action">Action</label>
+                    <select id="docker-action">
+                        <option value="build">Build Image</option>
+                        <option value="run" selected>Run Container</option>
+                        <option value="stop">Stop Container</option>
+                        <option value="logs">View Logs</option>
+                        <option value="exec">Shell Inside Container</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary" id="generate-btn">
+                    <i class="fa-solid fa-code"></i> Generate Command
+                </button>
+            </div>
+
+            <div class="command-output">
+                <div class="command-code" id="command-display">
+                    docker run -d -p 8080:80 my-flask-app
+                </div>
+                <button class="copy-btn" id="copy-btn" title="Copy to clipboard">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
+            </div>
+            
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;">
+                <p><strong style="color: var(--text-main);">Quick Tip:</strong> Ensure you run these commands from the root directory containing your <code style="font-family: 'JetBrains Mono', monospace; color: var(--accent-blue); background: rgba(0,0,0,0.2); padding: 0.1rem 0.3rem; border-radius: 4px;">Dockerfile</code>.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Built with <i class="fa-solid fa-heart" style="color: #ff3e3e;"></i> for Flask + Docker pair programming.</p>
+    </footer>
+
+    <script>
+        // Fetch System Diagnostics
+        async function fetchDiagnostics() {
+            try {
+                const response = await fetch('/api/info');
+                const data = await response.json();
+                
+                // Update Health Status
+                const statusBadge = document.getElementById('health-status');
+                statusBadge.textContent = data.status;
+                
+                // Populate Grid
+                const grid = document.getElementById('info-grid');
+                grid.innerHTML = `
+                    <div class="info-label">OS Platform</div>
+                    <div class="info-value">${data.os}</div>
+                    <div class="info-label">OS Release</div>
+                    <div class="info-value">${data.os_release}</div>
+                    <div class="info-label">Architecture</div>
+                    <div class="info-value">${data.cpu_architecture}</div>
+                    <div class="info-label">Python Version</div>
+                    <div class="info-value">${data.python_version}</div>
+                    <div class="info-label">PID</div>
+                    <div class="info-value">${data.process_id}</div>
+                    <div class="info-label">Container Time</div>
+                    <div class="info-value">${data.container_time}</div>
+                `;
+
+                // Populate Env Variables
+                const tbody = document.getElementById('env-table-body');
+                tbody.innerHTML = '';
+                
+                const sortedKeys = Object.keys(data.environment_vars).sort();
+                if (sortedKeys.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="2" style="text-align: center; color: var(--text-muted);">No environment variables found</td></tr>`;
+                } else {
+                    sortedKeys.forEach(key => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="env-key">${key}</td>
+                            <td class="env-value">${data.environment_vars[key]}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching diagnostics:', error);
+                document.getElementById('health-status').textContent = 'Error';
+                document.getElementById('health-status').parentElement.style.borderColor = 'var(--text-muted)';
+                document.getElementById('health-status').parentElement.style.color = 'var(--text-muted)';
+                document.getElementById('health-status').parentElement.querySelector('.status-dot').style.backgroundColor = 'var(--text-muted)';
+            }
+        }
+
+        // Generate Command Helper
+        async function generateCommand() {
+            const imageName = document.getElementById('image-name').value.trim() || 'my-flask-app';
+            const port = document.getElementById('host-port').value || '8080';
+            const action = document.getElementById('docker-action').value;
+            
+            try {
+                const response = await fetch('/api/docker-helper', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_name: imageName, port: port, action: action })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('command-display').textContent = data.command;
+                }
+            } catch (error) {
+                console.error('Error generating command:', error);
+            }
+        }
+
+        // Copy Command Clipboard functionality
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.addEventListener('click', async () => {
+            const command = document.getElementById('command-display').textContent.trim();
+            try {
+                await navigator.clipboard.writeText(command);
+                const icon = copyBtn.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                icon.style.color = 'var(--accent-green)';
+                setTimeout(() => {
+                    icon.className = 'fa-regular fa-copy';
+                    icon.style.color = '';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+        });
+
+        // Trigger command update on change
+        document.getElementById('image-name').addEventListener('input', generateCommand);
+        document.getElementById('host-port').addEventListener('input', generateCommand);
+        document.getElementById('docker-action').addEventListener('change', generateCommand);
+        document.getElementById('generate-btn').addEventListener('click', generateCommand);
+
+        // Run on load
+        fetchDiagnostics();
+    </script>
+</body>
+</html>
