@@ -1,4 +1,4 @@
-# 📋 Git & GitHub Cheat Sheet
+# 📋 Git & GitHub Commands
 
 A handy reference of the most frequently used Git commands.
 

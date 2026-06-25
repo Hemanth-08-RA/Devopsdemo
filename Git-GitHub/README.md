@@ -68,5 +68,5 @@ GitHub makes team collaboration easy through the following workflow:
 
 To help you get started quickly, we've provided:
 
-- 📋 [**Git & GitHub Cheat Sheet**](file:///C:/Users/asus/.gemini/antigravity/scratch/Devopsdemo/Git-GitHub/cheat-sheet.md): A handy reference for common commands.
-- 🚀 [**Interactive Local Workflow Demo**](file:///C:/Users/asus/.gemini/antigravity/scratch/Devopsdemo/Git-GitHub/basic-demo/README.md): A hands-on script that automatically initializes, modifies, commits, branches, and merges in a sandbox directory on your machine so you can watch Git work in real-time.
+- 📋 [**Git & GitHub Commands**](commands.md): A handy reference for common commands.
+- 🚀 [**Interactive Local Workflow Demo**](basic-demo/README.md): A hands-on script that automatically initializes, modifies, commits, branches, and merges in a sandbox directory on your machine so you can watch Git work in real-time.
