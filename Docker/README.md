@@ -12,24 +12,15 @@ Welcome to the Docker learning module! This directory contains simple, clear, an
 
 While Virtual Machines package a full operating system (including the kernel), Docker containers share the host system's kernel, making them much faster, smaller, and resource-efficient:
 
-```mermaid
-graph TD
-    subgraph VM["Virtual Machines Stack"]
-        direction TB
-        A["App A & App B"] --- B["Bins / Libs"]
-        B --- C["Guest OS"]
-        C --- D["Hypervisor (e.g., VMware)"]
-        D --- E["Host OS"]
-        E --- F["Infrastructure / Hardware"]
-    end
-    subgraph Docker["Docker Containers Stack"]
-        direction TB
-        A2["App A & App B"] --- B2["Bins / Libs"]
-        B2 --- D2["Docker Engine (Shared)"]
-        D2 --- E2["Host OS"]
-        E2 --- F2["Infrastructure / Hardware"]
-    end
-```
+| Feature | Virtual Machines (VMs) | Docker Containers |
+| :--- | :--- | :--- |
+| **Architecture** | Runs on a Hypervisor with a full Guest OS. | Runs on the Host OS kernel via Docker Engine. |
+| **Operating System** | Each VM has its own Guest OS (huge overhead). | Shares the host operating system kernel. |
+| **File Size** | Large (typically **Gigabytes**). | Extremely small (typically **Megabytes**). |
+| **Startup Time** | Slow (takes **minutes** to boot). | Instantaneous (takes **seconds**). |
+| **Resource Allocation**| Reserves fixed RAM/CPU from the host. | Shares host resources dynamically on-demand. |
+| **Isolation** | Hardware-level isolation (very secure). | Process-level namespace isolation. |
+| **Portability** | Hard to move across different platforms. | Highly portable (runs anywhere Docker is installed). |
 
 ---
 
